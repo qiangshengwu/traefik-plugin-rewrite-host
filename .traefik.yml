@@ -1,0 +1,6 @@
+displayName: Rewrite Upstream Host
+type: middleware
+import: github.com/qiangshengwu/traefik-plugin-rewrite-host
+summary: Override the upstream HTTP Host header
+testData:
+  host: devops-seaweedfs-s3:8333
