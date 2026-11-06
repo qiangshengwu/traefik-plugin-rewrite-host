@@ -20,12 +20,7 @@ type S3Host struct {
 	name string
 }
 
-func New(
-	ctx context.Context,
-	next http.Handler,
-	config *Config,
-	name string,
-) (http.Handler, error) {
+func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	if config == nil {
 		return nil, http.ErrNotSupported
 	}
@@ -39,18 +34,12 @@ func New(
 		return nil, http.ErrNotSupported
 	}
 
-	return &S3Host{
-		next: next,
-		host: host,
-		name: name,
-	}, nil
+	return &S3Host{next: next, host: host, name: name}, nil
 }
 
-func (s *S3Host) ServeHTTP(
-	rw http.ResponseWriter,
-	req *http.Request,
-) {
-	req.Host = s.host
-	req.Header.Set("X-Forwarded-Host", s.host)
-	s.next.ServeHTTP(rw, req)
+func (s *S3Host) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	newReq := req.Clone(req.Context())
+	newReq.Host = s.host
+	newReq.Header.Set("X-Forwarded-Host", s.host)
+	s.next.ServeHTTP(rw, newReq)
 }
